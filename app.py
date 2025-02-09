@@ -31,11 +31,11 @@ if st.button("Generate Collage"):
         # Fetch top 100 tracks
         top_tracks = []
         st.write("Starting...")
-        for offset in [0, 50]:
+        for offset in [0, 10]:
             st.write(f"Sending request with offset={offset}...")
             start_time = time.time()
             try:
-                tracks = sp.current_user_top_tracks(limit=50, time_range='long_term', offset=0)
+                tracks = sp.current_user_top_tracks(limit=10, time_range='long_term', offset=offset)
                 elapsed_time = time.time() - start_time
                 st.write(f"Request from offset={offset} completed at {elapsed_time:.2f} seconds. Got {len(tracks['items'])} songs.")
             except Exception as e:
