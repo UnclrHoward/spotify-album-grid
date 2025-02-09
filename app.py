@@ -28,15 +28,21 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
 
 if st.button("Generate Collage"):
     with st.spinner("Fetching your top tracks..."):
-        start_time = time.time()
         # Fetch top 100 tracks
         top_tracks = []
-        st.write("FUCK THIS")
+        st.write("Starting...")
         for offset in [0, 50]:
-            tracks = sp.current_user_top_tracks(limit=50, time_range='long_term', offset=0)
+            st.write(f"Sending request with offset={offset}...")
+            start_time = time.time()
+            try:
+                tracks = sp.current_user_top_tracks(limit=50, time_range='long_term', offset=0)
+                elapsed_time = time.time() - start_time
+                st.write(f"Request from offset={offset} completed at {elapsed_time:.2f} seconds. Got {len(tracks['items'])} songs.")
+            except Exception as e:
+                st.error(f"Error with offset={offset}: {e}")
+                continue
             top_tracks.extend(tracks['items'])
-            end_time = time.time()
-            print(f"Fetched tracks in {end_time - start_time:.2f} seconds")
+        st.write("All requests are done.")
 
         # Get unique albums
         unique_albums = {}
