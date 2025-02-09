@@ -1,3 +1,12 @@
+import streamlit as st
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+
+# Spotify API credentials (замените на свои)
+CLIENT_ID = "43e1119119344adcb121bc875d9d8880"
+CLIENT_SECRET = "ef2007cdeda7488cbc5ffcd5c99b82dc"
+REDIRECT_URI = "https://spotify-album-grid-nxymkrtq7ubmdvttd2r7fd.streamlit.app/"  # Если разворачиваете на Streamlit Cloud, укажите ваш URL
+
 # Define the scope for permissions
 SCOPE = "user-top-read"
 
@@ -16,7 +25,7 @@ def get_top_tracks():
     tracks = []
     for offset in [0, 50]:
         # Попробуйте сменить time_range на "medium_term" или "short_term", если long_term не возвращает данные
-        response = sp.current_user_top_tracks(limit=50, time_range="long_term", offset=offset)
+        response = sp.current_user_top_tracks(limit=50, time_range="short_term", offset=offset)
         st.write(f"Response at offset {offset}:", response)  # Отладочный вывод
         tracks.extend(response.get("items", []))
     return tracks
