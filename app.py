@@ -17,86 +17,36 @@ CLIENT_ID = "43e1119119344adcb121bc875d9d8880"
 CLIENT_SECRET = "ef2007cdeda7488cbc5ffcd5c99b82dc"
 REDIRECT_URI = "https://spotify-album-grid-nxymkrtq7ubmdvttd2r7fd.streamlit.app/"
 
-# Authorization
+# Initialize Spotipy with OAuth
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     client_id=CLIENT_ID,
     client_secret=CLIENT_SECRET,
     redirect_uri=REDIRECT_URI,
-    scope="user-top-read",
-    show_dialog=True
+    scope=SCOPE,
+    show_dialog=True  # Forces re-authorization on each run
 ))
 
-if st.button("Generate Collage"):
-    with st.spinner("Fetching your top tracks..."):
-        # Fetch top 100 tracks
-        top_tracks = []
-        st.write("Starting...")
-        for offset in [0, 10]:
-            st.write(f"Sending request with offset={offset}...")
-            start_time = time.time()
-            try:
-                tracks = sp.current_user_top_tracks(limit=10, time_range='long_term', offset=offset)
-                elapsed_time = time.time() - start_time
-                st.write(f"Request from offset={offset} completed at {elapsed_time:.2f} seconds. Got {len(tracks['items'])} songs.")
-            except Exception as e:
-                st.error(f"Error with offset={offset}: {e}")
-                continue
-            top_tracks.extend(tracks['items'])
-        st.write("All requests are done.")
+st.title("Your 100 Favorite Tracks")
 
-        # Get unique albums
-        unique_albums = {}
-        for track in top_tracks:
-            album_name = track['album']['name']
-            artist_name = track['album']['artists'][0]['name']
-            album_image_url = track['album']['images'][0]['url']
+def get_top_tracks():
+    tracks = []
+    # Spotify API returns a maximum of 50 tracks per request, so we use two requests.
+    for offset in [0, 50]:
+        response = sp.current_user_top_tracks(limit=50, time_range="long_term", offset=offset)
+        tracks.extend(response["items"])
+    return tracks
 
-            if album_name not in unique_albums:
-                unique_albums[album_name] = {'artist': artist_name, 'image_url': album_image_url}
+try:
+    top_tracks = get_top_tracks()
+except Exception as e:
+    st.error(f"Error fetching tracks: {e}")
+    top_tracks = []
 
-        # Download images
-        images, colors = [], []
-        for album, info in unique_albums.items():
-            try:
-                response = requests.get(info['image_url'])
-                img = Image.open(BytesIO(response.content)).convert("RGB")
-                images.append(img)
-
-                # Calculate average color
-                stat = ImageStat.Stat(img)
-                avg_color = tuple(int(x) for x in stat.mean[:3])
-                colors.append(avg_color)
-
-            except Exception as e:
-                st.write(f"Error downloading album cover for {album}: {e}")
-
-        if not images:
-            st.error("Failed to download images.")
-            st.stop()
-
-        # Compute average background color
-        avg_bg_color = tuple(np.mean(colors, axis=0).astype(int))
-
-        # Calculate optimal grid size
-        num_images = len(images)
-        grid_width = math.ceil(math.sqrt(num_images))
-        grid_height = math.ceil(num_images / grid_width)
-
-        # Image dimensions
-        img_width, img_height = images[0].size
-        grid_image = Image.new('RGB', (img_width * grid_width, img_height * grid_height), avg_bg_color)
-
-        # Arrange images in the grid
-        for i, img in enumerate(images):
-            row, col = divmod(i, grid_width)
-            grid_image.paste(img, (col * img_width, row * img_height))
-
-        # Show collage in Streamlit
-        st.image(grid_image, caption="Your Album Collage", use_column_width=True)
-        
-        # Save and offer download
-        img_buffer = BytesIO()
-        grid_image.save(img_buffer, format="PNG")
-        img_buffer.seek(0)
-        st.download_button("Download Image", img_buffer, file_name="spotify_grid.png", mime="image/png")
-
+if top_tracks:
+    for i, track in enumerate(top_tracks, start=1):
+        track_name = track["name"]
+        # In case there are multiple artists, join their names with a comma
+        artist_names = ", ".join(artist["name"] for artist in track["artists"])
+        st.write(f"{i}. {track_name} by {artist_names}")
+else:
+    st.write("No tracks found. Please make sure you have authorized the app and have sufficient listening history.")
