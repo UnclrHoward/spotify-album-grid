@@ -33,10 +33,10 @@ if st.button("Generate Collage"):
         top_tracks = []
         for offset in [0, 50]:
             try:
-            tracks = sp.current_user_top_tracks(limit=50, time_range='long_term', offset=offset)
-            except Exception as e:
-            st.error(f"Ошибка при получении треков: {e}")
-            break
+    tracks = sp.current_user_top_tracks(limit=50, time_range='long_term', offset=offset)
+except Exception as e:
+    st.error(f"Ошибка при получении треков: {e}")
+    break  # если это внутри цикла, иначе используйте подходящий способ выхода
             top_tracks.extend(tracks['items'])
             end_time = time.time()
             print(f"Fetched tracks in {end_time - start_time:.2f} seconds")
