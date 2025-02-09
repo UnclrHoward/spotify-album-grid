@@ -33,7 +33,7 @@ if st.button("Generate Collage"):
         top_tracks = []
         st.write("FUCK THIS")
         for offset in [0, 50]:
-    tracks = sp.current_user_top_tracks(limit=50, time_range='long_term', offset=offset)
+            tracks = sp.current_user_top_tracks(limit=50, time_range='long_term', offset=0)
             top_tracks.extend(tracks['items'])
             end_time = time.time()
             print(f"Fetched tracks in {end_time - start_time:.2f} seconds")
