@@ -17,6 +17,9 @@ CLIENT_ID = "43e1119119344adcb121bc875d9d8880"
 CLIENT_SECRET = "ef2007cdeda7488cbc5ffcd5c99b82dc"
 REDIRECT_URI = "https://spotify-album-grid-nxymkrtq7ubmdvttd2r7fd.streamlit.app/"
 
+# Define the scope for permissions
+SCOPE = "user-top-read"
+
 # Initialize Spotipy with OAuth
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     client_id=CLIENT_ID,
