@@ -8,13 +8,13 @@ import math
 import streamlit as st
 
 # Streamlit UI
-st.title("Spotify Album Grid Generator")
+st.title("Spotify Album Grid Generator by Quentin Meat")
 st.write("Authorize with Spotify and generate a collage of your favorite albums!")
 
 # Spotify API credentials (replace with your own)
 CLIENT_ID = "43e1119119344adcb121bc875d9d8880"
 CLIENT_SECRET = "ef2007cdeda7488cbc5ffcd5c99b82dc"
-REDIRECT_URI = "http://localhost:8501"
+REDIRECT_URI = "https://spotify-album-grid-nxymkrtq7ubmdvttd2r7fd.streamlit.app/"
 
 # Authorization
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
