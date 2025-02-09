@@ -6,6 +6,7 @@ from io import BytesIO
 import numpy as np
 import math
 import streamlit as st
+import time
 
 # Streamlit UI
 st.title("Spotify Album Grid Generator by Quentin Meat")
@@ -14,7 +15,7 @@ st.write("Authorize with Spotify and generate a collage of your favorite albums!
 # Spotify API credentials (replace with your own)
 CLIENT_ID = "43e1119119344adcb121bc875d9d8880"
 CLIENT_SECRET = "ef2007cdeda7488cbc5ffcd5c99b82dc"
-REDIRECT_URI = "https://spotify-album-grid.streamlit.app/"
+REDIRECT_URI = "https://spotify-album-grid-nxymkrtq7ubmdvttd2r7fd.streamlit.app/"
 
 # Authorization
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
@@ -27,11 +28,14 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
 
 if st.button("Generate Collage"):
     with st.spinner("Fetching your top tracks..."):
+        start_time = time.time()
         # Fetch top 100 tracks
         top_tracks = []
         for offset in [0, 50]:
-            tracks = sp.current_user_top_tracks(limit=50, time_range='long_term', offset=offset)
+            tracks = sp.current_user_top_tracks(limit=50, time_range='long_term', offset=0)
             top_tracks.extend(tracks['items'])
+            end_time = time.time()
+            print(f"Fetched tracks in {end_time - start_time:.2f} seconds")
 
         # Get unique albums
         unique_albums = {}
