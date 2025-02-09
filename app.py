@@ -21,12 +21,20 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
 
 st.title("Your 100 Favorite Tracks")
 
+# Получим информацию о пользователе для проверки успешной авторизации
+try:
+    user_info = sp.current_user()
+    st.write("User Info:", user_info)
+except Exception as e:
+    st.error(f"Error fetching user info: {e}")
+
 def get_top_tracks():
     tracks = []
     for offset in [0, 50]:
-        # Попробуйте сменить time_range на "medium_term" или "short_term", если long_term не возвращает данные
-        response = sp.current_user_top_tracks(limit=50, time_range="short_term", offset=offset)
-        st.write(f"Response at offset {offset}:", response)  # Отладочный вывод
+        # Можно попробовать разные временные диапазоны: "long_term", "medium_term", "short_term"
+        response = sp.current_user_top_tracks(limit=50, time_range="long_term", offset=offset)
+        st.write(f"Response for offset {offset}:", response)  # Отладочный вывод
+        # Если по каким-либо причинам в ответе отсутствует ключ "items", используем пустой список
         tracks.extend(response.get("items", []))
     return tracks
 
@@ -36,7 +44,7 @@ except Exception as e:
     st.error(f"Error fetching tracks: {e}")
     top_tracks = []
 
-st.write("Total tracks fetched:", len(top_tracks))  # Отладочный вывод количества треков
+st.write("Total tracks fetched:", len(top_tracks))
 
 if top_tracks:
     for i, track in enumerate(top_tracks, start=1):
